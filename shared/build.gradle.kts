@@ -17,6 +17,7 @@ kotlin {
     }
     
     jvm()
+    macosArm64()
 
     js {
         browser()

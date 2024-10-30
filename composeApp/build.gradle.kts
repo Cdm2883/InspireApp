@@ -19,7 +19,14 @@ kotlin {
         }
     }
     
-    jvm("desktop")
+    jvm()
+    macosArm64 {
+        binaries {
+            executable {
+                entryPoint = "vip.cdms.inspire.MainKt"
+            }
+        }
+    }
     
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -42,12 +49,6 @@ kotlin {
     }
     
     sourceSets {
-        val desktopMain by getting
-        
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -57,7 +58,19 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(projects.shared)
         }
-        desktopMain.dependencies {
+
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
+        }
+
+        val desktopMain by creating {
+            dependsOn(commonMain.get())
+        }
+        jvmMain.get().dependsOn(desktopMain)
+        macosMain.get().dependsOn(desktopMain)
+
+        jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
         }
     }
@@ -80,8 +93,15 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-android-rules.pro")
+        }
+        create("preview") {
+            initWith(getByName("release"))
+            versionNameSuffix = "-preview"
+            applicationIdSuffix = ".preview"
         }
     }
     compileOptions {
@@ -102,6 +122,14 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "vip.cdms.inspire"
             packageVersion = "1.0.0"
+        }
+
+        buildTypes.release.proguard {
+            version.set("7.5.0")
+            obfuscate.set(true)
+            optimize.set(true)
+            joinOutputJars.set(true)
+            configurationFiles.from(project.file("compose-desktop.pro"))
         }
     }
 }
