@@ -1,7 +1,8 @@
-rootProject.name = "Inspire"
+rootProject.name = "InspireApp"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         google {
             mavenContent {
@@ -16,6 +17,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         google {
             mavenContent {
@@ -29,4 +31,7 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+include(":harmonyApp")
+include(":browserExtension")
+include(":dataSynchronizer")
 include(":shared")
