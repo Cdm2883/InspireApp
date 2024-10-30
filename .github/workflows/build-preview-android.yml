@@ -1,0 +1,88 @@
+name: Build a preview version for Android
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'harmonyApp/**'
+      - 'browserExtension/**'
+      - 'composeApp/src/desktopMain/**'
+      - 'composeApp/src/wasmJsMain/**'
+      - 'composeApp/compose-desktop.pro'
+      - '.gitignore'
+      - 'README.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: oracle
+
+      - name: Build application
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :composeApp:assemblePreview
+          
+          cp composeApp/build/outputs/apk/preview/composeApp-preview-unsigned.apk \
+          preview-unsigned.apk
+
+      - name: Upload unsigned APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: inspire-preview-${{ github.sha }}
+          path: preview-unsigned.apk
+
+  sign:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download unsigned apk
+        uses: actions/download-artifact@v4
+        with:
+          name: inspire-preview-${{ github.sha }}
+          path: unsigned-artifact
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: oracle
+
+      - name: Generate keystore
+        run: |
+          keytool -genkeypair -v \
+          -keystore temporary-key.jks \
+          -keyalg RSA -keysize 2048 -validity 90 \
+          -alias inspire-preview-${{ github.sha }} \
+          -storepass 114514 \
+          -keypass 114514 \
+          -dname "CN=inspire, OU=inspire, O=${{ github.sha }}, L=inspire, S=inspire, C=inspire"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;34.0.0'
+
+      - name: Sign APK
+        run: |
+          $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks temporary-key.jks \
+          --ks-key-alias inspire-preview-${{ github.sha }} \
+          --ks-pass pass:114514 \
+          --key-pass pass:114514 \
+          --out signed.apk \
+          unsigned-artifact/preview-unsigned.apk
+
+      - name: Upload signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-inspire-preview-${{ github.sha }}
+          path: signed.apk

@@ -1,0 +1,95 @@
+name: Build a preview version for Desktop
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'harmonyApp/**'
+      - 'browserExtension/**'
+      - 'composeApp/src/androidMain/**'
+      - 'composeApp/src/materialMain/**'
+      - 'composeApp/src/wasmJsMain/**'
+      - 'composeApp/proguard-android-rules.pro'
+      - '.gitignore'
+      - 'README.md'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        targets:
+          - os: ubuntu-latest
+            name: linux-x64
+            format: deb
+          - os: macos-latest
+            name: macos-arm64
+            format: dmg
+          - os: windows-latest
+            name: windows-x64
+            format: msi
+    runs-on: ${{ matrix.targets.os }}
+    steps:
+
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: oracle
+
+      - name: Grant execute permission for gradlew (Linux and macOS)
+        if: runner.os != 'Windows'
+        run: chmod +x ./gradlew
+
+      - name: Create an application image with bundled JDK & resources
+        run: ./gradlew :composeApp:createReleaseDistributable
+
+      - name: Upload the application image
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-image-${{ matrix.targets.name }}-${{ github.sha }}
+          path: composeApp/build/compose/binaries/main-release/app/
+
+      - name: Package an application image into a format compatible for current OS
+        run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS
+
+      - name: Upload the application installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-installer-${{ matrix.targets.name }}-${{ github.sha }}
+          path: composeApp/build/compose/binaries/main-release/${{ matrix.targets.format }}/
+
+      - name: Package the JAR for current OS
+        run: ./gradlew :composeApp:packageReleaseUberJarForCurrentOS
+
+      - name: Upload the JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: uber-${{ matrix.targets.name }}-${{ github.sha }}
+          path: composeApp/build/compose/jars/
+
+  build-macos-native:
+    runs-on: macos-latest
+    steps:
+
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: oracle
+
+      - name: Build executable
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :composeApp:linkReleaseExecutableMacosArm64
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm-${{ github.sha }}
+          path: composeApp/build/bin/macosarm64/releaseExecutable

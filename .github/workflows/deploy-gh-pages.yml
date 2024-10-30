@@ -1,0 +1,40 @@
+name: Publish application on GitHub Pages
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'harmonyApp/**'
+      - 'browserExtension/**'
+      - 'composeApp/src/androidMain/**'
+      - 'composeApp/src/desktopMain/**'
+      - 'composeApp/compose-desktop.pro'
+      - 'composeApp/proguard-android-rules.pro'
+      - '.gitignore'
+      - 'README.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: oracle
+
+      - name: Build application
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :composeApp:wasmJsBrowserDistribution
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./composeApp/build/dist/wasmJs/productionExecutable
+          cname: inspire.cdms.vip

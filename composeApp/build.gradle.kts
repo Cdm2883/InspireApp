@@ -23,7 +23,7 @@ kotlin {
     macosArm64 {
         binaries {
             executable {
-                entryPoint = "vip.cdms.inspire.MainKt"
+                entryPoint = "vip.cdms.inspire.MainKt.main"
             }
         }
     }
