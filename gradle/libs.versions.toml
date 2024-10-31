@@ -8,8 +8,15 @@ kotlin = "2.0.21"
 
 androidx-activity-compose = "1.9.3"
 
+konyaco-fluent = "0.0.1-dev.8"
+mayakapps-compose-window-styler = "0.3.3-SNAPSHOT"
+
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+
+konyaco-fluent = { module = "com.konyaco:fluent", version.ref = "konyaco-fluent" }
+konyaco-fluent-icons-extended = { module = "com.konyaco:fluent-icons-extended", version.ref = "konyaco-fluent" }
+mayakapps-compose-window-styler = { module = "com.mayakapps.compose:window-styler", version.ref = "mayakapps-compose-window-styler" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

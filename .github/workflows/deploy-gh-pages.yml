@@ -8,6 +8,7 @@ on:
       - 'browserExtension/**'
       - 'composeApp/src/androidMain/**'
       - 'composeApp/src/desktopMain/**'
+      - 'composeApp/src/macosMain/**'
       - 'composeApp/compose-desktop.pro'
       - 'composeApp/proguard-android-rules.pro'
       - '.gitignore'
@@ -31,6 +32,8 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew :composeApp:wasmJsBrowserDistribution
+          ./gradlew :composeApp:jsBrowserDistribution
+          mv composeApp/build/dist/js/productionExecutable composeApp/build/dist/wasmJs/productionExecutable/js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

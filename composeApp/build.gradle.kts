@@ -23,11 +23,11 @@ kotlin {
     macosArm64 {
         binaries {
             executable {
-                entryPoint = "vip.cdms.inspire.MainKt.main"
+                entryPoint = "vip.cdms.inspire.main"
             }
         }
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -47,31 +47,86 @@ kotlin {
         }
         binaries.executable()
     }
-    
+    js(IR) {
+        moduleName = "composeApp"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+            }
+        }
+        binaries.executable()
+    }
+
     sourceSets {
+        //                        ┌──────────┐
+        //                        │commonMain│
+        //   <SourceSets>         └─────┬────┘
+        //                    ┌─────────┴────────┐
+        //             ┌──────▼─────┐      ┌─────▼─────┐
+        //             │materialMain│      │desktopMain│
+        //             └──────┬─────┘      └─────┬─────┘
+        //       ┌────────────┼─────────┐   ┌────┴──────┐
+        // ┌─────▼─────┐  ┌───▼───┐  ┌──▼───▼──┐    ┌───▼───┐
+        // │androidMain│  │webMain│  │macosMain│    │jvmMain│
+        // └───────────┘  └───┬───┘  └─────────┘    └───────┘
+        //              ┌─────┴──────┐
+        //         ┌────▼─────┐  ┌───▼──┐
+        //         │wasmJsMain│  │jsMain│
+        //         └──────────┘  └──────┘
+
         commonMain.dependencies {
             implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
             implementation(compose.ui)
+            implementation(compose.foundation)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(projects.shared)
         }
 
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
+        // Material Design
+        val materialMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(compose.material3)
+            }
+        }
+        androidMain.get().apply {
+            dependsOn(materialMain)
+            dependencies {
+                implementation(compose.preview)
+                implementation(libs.androidx.activity.compose)
+            }
+        }
+
+        val webMain by creating {
+            dependsOn(materialMain)
+        }
+        wasmJsMain.get().apply {
+            dependsOn(webMain)
+        }
+        jsMain.get().apply {
+            dependsOn(webMain)
         }
 
         val desktopMain by creating {
             dependsOn(commonMain.get())
         }
-        jvmMain.get().dependsOn(desktopMain)
-        macosMain.get().dependsOn(desktopMain)
 
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
+        val macosMain by creating {
+            dependsOn(materialMain)
+            dependsOn(desktopMain)
+        }
+        macosArm64Main.get().dependsOn(macosMain)
+
+        // Fluent Design
+        jvmMain.get().apply {
+            dependsOn(desktopMain)
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.konyaco.fluent)
+                implementation(libs.konyaco.fluent.icons.extended)
+                implementation(libs.mayakapps.compose.window.styler)
+            }
         }
     }
 }
@@ -120,7 +175,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "vip.cdms.inspire"
+            packageName = "Inspire"
             packageVersion = "1.0.0"
         }
 
@@ -131,5 +186,14 @@ compose.desktop {
             joinOutputJars.set(true)
             configurationFiles.from(project.file("compose-desktop.pro"))
         }
+    }
+}
+
+compose.desktop.nativeApplication {
+    targets(kotlin.targets.getByName("macosArm64"))
+    distributions {
+        targetFormats(TargetFormat.Dmg)
+        packageName = "Inspire"
+        packageVersion = "1.0.0"
     }
 }
