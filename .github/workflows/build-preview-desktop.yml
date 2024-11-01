@@ -71,7 +71,7 @@ jobs:
           name: jar-${{ matrix.targets.name }}-${{ github.sha }}
           path: composeApp/build/compose/jars/
 
-  build-macos-native:
+  build-native-macos-arm64:
     runs-on: macos-latest
     steps:
 
