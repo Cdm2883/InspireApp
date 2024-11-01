@@ -193,6 +193,16 @@ tasks.named("jsProcessResources") {
     doLast { injectWebResources(false) }
 }
 
+// DO NOT DELETE or FIX IT: build
+tasks {
+    named("jsBrowserProductionWebpack") {
+        dependsOn("wasmJsProductionExecutableCompileSync")
+    }
+    named("wasmJsBrowserProductionWebpack") {
+        dependsOn("jsProductionExecutableCompileSync")
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "vip.cdms.inspire.MainKt"
