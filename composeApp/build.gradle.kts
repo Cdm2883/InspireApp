@@ -131,6 +131,10 @@ kotlin {
     }
 }
 
+val appVersion = libs.versions.inspire.app.version.get()
+val appVersionCore = """(\d+)\.(\d+)\.(\d+)""".toRegex().find(appVersion)?.value ?: throw Error()
+val appVersionCode = libs.versions.inspire.app.code.get().toInt()
+
 android {
     namespace = "vip.cdms.inspire"
     compileSdk = libs.versions.android.sdk.compile.get().toInt()
@@ -139,8 +143,8 @@ android {
         applicationId = "vip.cdms.inspire"
         minSdk = libs.versions.android.sdk.min.get().toInt()
         targetSdk = libs.versions.android.sdk.target.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -196,7 +200,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Inspire"
-            packageVersion = "1.0.0"
+            packageVersion = appVersionCore
         }
 
         buildTypes.release.proguard {
@@ -214,6 +218,6 @@ compose.desktop.nativeApplication {
     distributions {
         targetFormats(TargetFormat.Dmg)
         packageName = "Inspire"
-        packageVersion = "1.0.0"
+        packageVersion = appVersionCore
     }
 }

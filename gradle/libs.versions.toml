@@ -1,4 +1,7 @@
 [versions]
+inspire-app-version = "1.0.0-alpha"
+inspire-app-code = "1"
+
 android-gradle-plugin = "8.5.2"
 android-sdk-compile = "34"
 android-sdk-min = "24"
