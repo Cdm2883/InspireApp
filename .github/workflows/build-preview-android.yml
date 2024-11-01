@@ -8,6 +8,7 @@ on:
       - 'browserExtension/**'
       - 'composeApp/src/desktopMain/**'
       - 'composeApp/src/macosMain/**'
+      - 'composeApp/src/webMain/**'
       - 'composeApp/src/wasmJsMain/**'
       - 'composeApp/src/jsMain/**'
       - 'composeApp/compose-desktop.pro'

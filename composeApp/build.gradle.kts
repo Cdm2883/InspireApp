@@ -169,6 +169,26 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
+// Web Resources
+val webResourcesInject = mapOf<String, File.(isWasm: Boolean) -> Unit>(
+    "index.html" to {
+        writeText(readText().replace("{% TARGET_HEAD %}", if (it) "" else """
+            <script src="skiko.js"></script>
+        """.trimIndent()))
+    }
+)
+fun injectWebResources(isWasm: Boolean) = webResourcesInject.forEach { (path, action) ->
+    val processedDir = "${layout.buildDirectory.get()}/processedResources/${if (isWasm) "wasmJs" else "js"}/main"
+    val file = file("$processedDir/$path")
+    action(file, isWasm)
+}
+tasks.named("wasmJsProcessResources") {
+    doLast { injectWebResources(true) }
+}
+tasks.named("jsProcessResources") {
+    doLast { injectWebResources(false) }
+}
+
 compose.desktop {
     application {
         mainClass = "vip.cdms.inspire.MainKt"

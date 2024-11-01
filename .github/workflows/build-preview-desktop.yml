@@ -7,6 +7,7 @@ on:
       - 'harmonyApp/**'
       - 'browserExtension/**'
       - 'composeApp/src/androidMain/**'
+      - 'composeApp/src/webMain/**'
       - 'composeApp/src/wasmJsMain/**'
       - 'composeApp/src/jsMain/**'
       - 'composeApp/proguard-android-rules.pro'
@@ -49,7 +50,7 @@ jobs:
       - name: Upload the application image
         uses: actions/upload-artifact@v4
         with:
-          name: application-image-${{ matrix.targets.name }}-${{ github.sha }}
+          name: image-${{ matrix.targets.name }}-${{ github.sha }}
           path: composeApp/build/compose/binaries/main-release/app/
 
       - name: Package an application image into a format compatible for current OS
@@ -58,7 +59,7 @@ jobs:
       - name: Upload the application installer
         uses: actions/upload-artifact@v4
         with:
-          name: application-installer-${{ matrix.targets.name }}-${{ github.sha }}
+          name: installer-${{ matrix.targets.name }}-${{ github.sha }}
           path: composeApp/build/compose/binaries/main-release/${{ matrix.targets.format }}/
 
       - name: Package the JAR for current OS
@@ -67,7 +68,7 @@ jobs:
       - name: Upload the JAR
         uses: actions/upload-artifact@v4
         with:
-          name: uber-${{ matrix.targets.name }}-${{ github.sha }}
+          name: jar-${{ matrix.targets.name }}-${{ github.sha }}
           path: composeApp/build/compose/jars/
 
   build-macos-native:
@@ -91,5 +92,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: macos-arm-${{ github.sha }}
+          name: native-macos-arm64-${{ github.sha }}
           path: composeApp/build/bin/macosarm64/releaseExecutable
