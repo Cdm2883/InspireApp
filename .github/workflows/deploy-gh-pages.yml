@@ -33,7 +33,7 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :composeApp:wasmJsBrowserDistribution
           ./gradlew :composeApp:jsBrowserDistribution
-          mv composeApp/build/dist/js/productionExecutable composeApp/build/dist/wasmJs/productionExecutable/js
+          mv composeApp/build/dist/js/productionExecutable composeApp/build/dist/wasmJs/productionExecutable/kjs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
