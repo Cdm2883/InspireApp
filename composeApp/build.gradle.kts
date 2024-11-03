@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.tasks.AbstractProguardTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -70,7 +71,7 @@ kotlin {
                     mainClass = codeMainClass
                     classpath = codeSource
                 }
-                tasks.register<ShadowJar>("packageFluentDesktopForCurrentOs") {
+                val jarTask = tasks.register<ShadowJar>("packageFluentDesktopForCurrentOs") {
                     group = taskGroup
                     archiveBaseName = "Inspire-fluent-" + DesktopPlatforms.Current.kebabName
                     archiveVersion = appVersion
@@ -83,9 +84,28 @@ kotlin {
                         attributes["Main-Class"] = codeMainClass
                     }
                 }
-                tasks.register("packageReleaseFluentDesktopForCurrentOs") {
-                    // TODO: ProGuard
-                    // TODO: Github Actions auto building
+                tasks.register<AbstractProguardTask>("packageReleaseFluentDesktopForCurrentOs") {
+                    dependsOn(jarTask)
+                    fun buildDirFile(path: String) = layout.buildDirectory.file(path).get().asFile
+                    val jar = jarTask.get()
+
+                    proguardVersion = libs.versions.proguard.get()
+                    proguardFiles.from(project.configurations.detachedConfiguration(
+                        project.dependencies.create(libs.plugins.proguard.gradle.get().toString())
+                    ))
+
+                    mainClass = codeMainClass
+                    mainJar = jar.archiveFile
+                    joinOutputJars = true
+                    inputFiles.from(jar.archiveFile)
+                    destinationDir = buildDirFile("compose/jars")
+
+                    defaultComposeRulesFile = buildDirFile("compose/default-resources/${libs.versions.compose.multiplatform.get()}/default-compose-desktop-rules.pro")
+                    configurationFiles.from(
+                        buildDirFile("compose/tmp/proguardReleaseJars/jars-config.pro"),
+                        project.file("compose-desktop.pro"),
+                        project.file("compose-desktop-fluent.pro")
+                    )
                 }
             }
         }
@@ -276,7 +296,7 @@ compose.desktop {
         }
 
         buildTypes.release.proguard {
-            version = "7.5.0"
+            version = libs.versions.proguard.get()
             obfuscate = true
             optimize = true
             joinOutputJars = true

@@ -9,6 +9,7 @@ android-sdk-target = "34"
 compose-multiplatform = "1.7.0"
 kotlin = "2.0.21"
 gradleup-shadow = "8.3.0"
+proguard = "7.5.0"
 
 androidx-activity-compose = "1.9.3"
 
@@ -29,3 +30,4 @@ compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-m
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "gradleup-shadow" }
+proguard-gradle = { id = "com.guardsquare:proguard-gradle", version.ref = "proguard" }
