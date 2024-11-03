@@ -184,6 +184,7 @@ kotlin {
         // Fluent Design
         val jvmFluent by getting {
             dependencies {
+                compileOnly(projects.composeApp)  // fix IDEA Auto Completing
                 implementation(libs.konyaco.fluent)
                 implementation(libs.konyaco.fluent.icons.extended)
                 implementation(libs.mayakapps.compose.window.styler)
