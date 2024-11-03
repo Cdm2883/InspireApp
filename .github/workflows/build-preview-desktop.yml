@@ -80,3 +80,23 @@ jobs:
         with:
           name: jar-${{ matrix.targets.name }}-${{ github.sha }}
           path: composeApp/build/compose/jars/
+
+      # Fluent Desktop
+
+      - name: Clear JAR outputs (Linux and macOS)
+        if: runner.os != 'Windows'
+        run: rm -rf composeApp/build/compose/jars/*
+
+      - name: Clear JAR outputs (Windows)
+        if: runner.os == 'Windows'
+        run: Remove-Item -Path 'composeApp\build\compose\jars\*' -Recurse -Force
+        shell: powershell
+
+      - name: Package the JAR for current OS (Fluent)
+        run: ./gradlew :composeApp:packageReleaseFluentDesktopForCurrentOs
+
+      - name: Upload the JAR (Fluent)
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-fluent-${{ matrix.targets.name }}-${{ github.sha }}
+          path: composeApp/build/compose/jars/
