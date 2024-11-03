@@ -1,4 +1,4 @@
-package vip.cdms.inspire
+package vip.cdms.inspire.fluent
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image

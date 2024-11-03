@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
@@ -9,6 +11,34 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.gradleup.shadow)
+}
+
+val appVersion = libs.versions.inspire.app.version.get()
+val appVersionCore = """(\d+)\.(\d+)\.(\d+)""".toRegex().find(appVersion)?.value ?: throw Error()
+val appVersionCode = libs.versions.inspire.app.code.get().toInt()
+
+enum class DesktopPlatforms(val kebabName: String) {
+    MacosArm64("macos-arm64"),
+    MacosX64("macos-x64"),
+    LinuxArm64("linux-arm64"),
+    LinuxX64("linux-x64"),
+    WindowsX64("windows-x64");
+    companion object {
+        val Current by lazy {
+            val hostOs = System.getProperty("os.name")
+            val isArm64 = System.getProperty("os.arch") == "aarch64"
+            val isMingwX64 = hostOs.startsWith("Windows")
+            when {
+                hostOs == "Mac OS X" && isArm64 -> MacosArm64
+                hostOs == "Mac OS X" && !isArm64 -> MacosX64
+                hostOs == "Linux" && isArm64 -> LinuxArm64
+                hostOs == "Linux" && !isArm64 -> LinuxX64
+                isMingwX64 -> WindowsX64
+                else -> throw GradleException("Host OS is not supported in Compose Desktop.")
+            }
+        }
+    }
 }
 
 kotlin {
@@ -19,11 +49,53 @@ kotlin {
         }
     }
     
-    jvm()
-    macosArm64 {
-        binaries {
-            executable {
-                entryPoint = "vip.cdms.inspire.main"
+    jvm {
+        compilations {
+            val main by getting
+            val fluent by compilations.creating {
+                defaultSourceSet {
+                    dependencies {
+                        implementation(main.compileDependencyFiles + main.runtimeDependencyFiles + main.output.allOutputs)
+                        ComposePlugin.Dependencies(project).desktop.run {
+                            runtimeOnly(macos_arm64)
+                            runtimeOnly(macos_x64)
+                            runtimeOnly(linux_arm64)
+                            runtimeOnly(linux_x64)
+                            runtimeOnly(windows_x64)
+                        }
+                    }
+                }
+
+                val group = "compose desktop fluent"
+                val codeSource = compileDependencyFiles + runtimeDependencyFiles + output.allOutputs
+                tasks.register<JavaExec>("runFluentDesktop") {
+                    setGroup(group)
+                    mainClass = "vip.cdms.inspire.fluent.MainKt"
+                    classpath = codeSource
+                }
+                tasks.register<ShadowJar>("packageFluentDesktopForCurrentOs") {
+                    setGroup(group)
+                    archiveBaseName = "Inspire-fluent-" + DesktopPlatforms.Current.kebabName
+                    archiveVersion = appVersion
+                    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                    from(codeSource) {
+                        val skikoExcludes = mutableMapOf(
+                            DesktopPlatforms.MacosArm64 to "**skiko**macos-arm64**",
+                            DesktopPlatforms.MacosX64 to "**skiko**macos-x64**",
+                            DesktopPlatforms.LinuxArm64 to "**skiko**linux-arm64**",
+                            DesktopPlatforms.LinuxX64 to "**skiko**linux-x64**",
+                            DesktopPlatforms.WindowsX64 to "**skiko**windows-x64**",
+                        )
+                        exclude(skikoExcludes.filter { (key) -> key != DesktopPlatforms.Current }.values)
+                    }
+                    manifest {
+                        attributes["Main-Class"] = "vip.cdms.inspire.fluent.MainKt"
+                    }
+                }
+                tasks.register("packageReleaseFluentDesktopForCurrentOs") {
+                    // TODO: ProGuard
+                    // TODO: Github Actions auto building
+                }
             }
         }
     }
@@ -61,14 +133,14 @@ kotlin {
         //                        ┌──────────┐
         //                        │commonMain│
         //   <SourceSets>         └─────┬────┘
-        //                    ┌─────────┴────────┐
-        //             ┌──────▼─────┐      ┌─────▼─────┐
-        //             │materialMain│      │desktopMain│
-        //             └──────┬─────┘      └─────┬─────┘
-        //       ┌────────────┼─────────┐   ┌────┴──────┐
-        // ┌─────▼─────┐  ┌───▼───┐  ┌──▼───▼──┐    ┌───▼───┐
-        // │androidMain│  │webMain│  │macosMain│    │jvmMain│
-        // └───────────┘  └───┬───┘  └─────────┘    └───────┘
+        //                    ┌─────────┴───────┐
+        //             ┌──────▼─────┐     ┌─────▼─────┐
+        //             │materialMain│     │desktopMain│
+        //             └──────┬─────┘     └─────┬─────┘
+        //       ┌────────────┼────────┐   ┌────┴────┐
+        // ┌─────▼─────┐  ┌───▼───┐  ┌─▼───▼─┐  ┌────▼────┐
+        // │androidMain│  │webMain│  │jvmMain│  │jvmFluent│
+        // └───────────┘  └───┬───┘  └───────┘  └─────────┘
         //              ┌─────┴──────┐
         //         ┌────▼─────┐  ┌───▼──┐
         //         │wasmJsMain│  │jsMain│
@@ -110,19 +182,17 @@ kotlin {
 
         val desktopMain by creating {
             dependsOn(commonMain.get())
-        }
-
-        val macosMain by creating {
-            dependsOn(materialMain)
-            dependsOn(desktopMain)
-        }
-        macosArm64Main.get().dependsOn(macosMain)
-
-        // Fluent Design
-        jvmMain.get().apply {
-            dependsOn(desktopMain)
             dependencies {
                 implementation(compose.desktop.currentOs)
+            }
+        }
+        jvmMain.get().apply {
+            dependsOn(desktopMain)
+            dependsOn(materialMain)
+        }
+        // Fluent Design
+        val jvmFluent by getting {
+            dependencies {
                 implementation(libs.konyaco.fluent)
                 implementation(libs.konyaco.fluent.icons.extended)
                 implementation(libs.mayakapps.compose.window.styler)
@@ -130,10 +200,6 @@ kotlin {
         }
     }
 }
-
-val appVersion = libs.versions.inspire.app.version.get()
-val appVersionCore = """(\d+)\.(\d+)\.(\d+)""".toRegex().find(appVersion)?.value ?: throw Error()
-val appVersionCode = libs.versions.inspire.app.code.get().toInt()
 
 android {
     namespace = "vip.cdms.inspire"
@@ -203,6 +269,10 @@ tasks {
     }
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 compose.desktop {
     application {
         mainClass = "vip.cdms.inspire.MainKt"
@@ -220,14 +290,5 @@ compose.desktop {
             joinOutputJars.set(true)
             configurationFiles.from(project.file("compose-desktop.pro"))
         }
-    }
-}
-
-compose.desktop.nativeApplication {
-    targets(kotlin.targets.getByName("macosArm64"))
-    distributions {
-        targetFormats(TargetFormat.Dmg)
-        packageName = "Inspire"
-        packageVersion = appVersionCore
     }
 }
