@@ -57,39 +57,30 @@ kotlin {
                     dependencies {
                         implementation(main.compileDependencyFiles + main.runtimeDependencyFiles + main.output.allOutputs)
                         ComposePlugin.Dependencies(project).desktop.run {
-                            runtimeOnly(macos_arm64)
-                            runtimeOnly(macos_x64)
-                            runtimeOnly(linux_arm64)
-                            runtimeOnly(linux_x64)
-                            runtimeOnly(windows_x64)
-                        }
+                            listOf(macos_arm64, macos_x64, linux_arm64, linux_x64, windows_x64)
+                        }.forEach { runtimeOnly(it) }
                     }
                 }
 
-                val group = "compose desktop fluent"
+                val taskGroup = "compose desktop fluent"
+                val codeMainClass = "vip.cdms.inspire.fluent.MainKt"
                 val codeSource = compileDependencyFiles + runtimeDependencyFiles + output.allOutputs
                 tasks.register<JavaExec>("runFluentDesktop") {
-                    setGroup(group)
-                    mainClass = "vip.cdms.inspire.fluent.MainKt"
+                    group = taskGroup
+                    mainClass = codeMainClass
                     classpath = codeSource
                 }
                 tasks.register<ShadowJar>("packageFluentDesktopForCurrentOs") {
-                    setGroup(group)
+                    group = taskGroup
                     archiveBaseName = "Inspire-fluent-" + DesktopPlatforms.Current.kebabName
                     archiveVersion = appVersion
                     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                     from(codeSource) {
-                        val skikoExcludes = mutableMapOf(
-                            DesktopPlatforms.MacosArm64 to "**skiko**macos-arm64**",
-                            DesktopPlatforms.MacosX64 to "**skiko**macos-x64**",
-                            DesktopPlatforms.LinuxArm64 to "**skiko**linux-arm64**",
-                            DesktopPlatforms.LinuxX64 to "**skiko**linux-x64**",
-                            DesktopPlatforms.WindowsX64 to "**skiko**windows-x64**",
-                        )
+                        val skikoExcludes = enumValues<DesktopPlatforms>().associateWith { "**skiko**${it.kebabName}**" }
                         exclude(skikoExcludes.filter { (key) -> key != DesktopPlatforms.Current }.values)
                     }
                     manifest {
-                        attributes["Main-Class"] = "vip.cdms.inspire.fluent.MainKt"
+                        attributes["Main-Class"] = codeMainClass
                     }
                 }
                 tasks.register("packageReleaseFluentDesktopForCurrentOs") {
@@ -240,7 +231,7 @@ dependencies {
 }
 
 // Web Resources
-val webResourcesInject = mapOf<String, File.(isWasm: Boolean) -> Unit>(
+val webResourcesInject = mapOf<_, File.(isWasm: Boolean) -> Unit>(
     "index.html" to {
         writeText(readText().replace("{% TARGET_HEAD %}", if (it) "" else """
             <script src="skiko.js"></script>
@@ -284,10 +275,10 @@ compose.desktop {
         }
 
         buildTypes.release.proguard {
-            version.set("7.5.0")
-            obfuscate.set(true)
-            optimize.set(true)
-            joinOutputJars.set(true)
+            version = "7.5.0"
+            obfuscate = true
+            optimize = true
+            joinOutputJars = true
             configurationFiles.from(project.file("compose-desktop.pro"))
         }
     }
