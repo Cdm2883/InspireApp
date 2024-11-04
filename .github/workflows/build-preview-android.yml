@@ -15,6 +15,9 @@ on:
       - 'composeApp/compose-desktop.pro'
       - '.gitignore'
       - 'README.md'
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
