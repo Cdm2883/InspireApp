@@ -71,7 +71,7 @@ jobs:
           java-version: 17
           distribution: oracle
 
-      - name: Generate keystore
+      - name: Generate random keystore
         run: |
           keytool -genkeypair -v \
           -keystore temporary-key.jks \
@@ -86,17 +86,17 @@ jobs:
         with:
           packages: 'build-tools;34.0.0'
 
-      - name: Sign APK
+      - name: Sign APK (Random)
         run: |
           $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks temporary-key.jks \
           --ks-key-alias inspire-preview-${{ github.sha }} \
           --ks-pass pass:114514 \
           --key-pass pass:114514 \
-          --out signed.apk \
+          --out random-signed.apk \
           unsigned-artifact/preview-unsigned.apk
 
-      - name: Upload signed APK
+      - name: Upload signed APK (Random)
         uses: actions/upload-artifact@v4
         with:
-          name: signed-inspire-preview-${{ github.sha }}
-          path: signed.apk
+          name: random-signed-inspire-preview-${{ github.sha }}
+          path: random-signed.apk
