@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/browserExtension" />
             <option value="$PROJECT_DIR$/composeApp" />
+            <option value="$PROJECT_DIR$/composeApp/wearOs" />
             <option value="$PROJECT_DIR$/dataSynchronizer" />
             <option value="$PROJECT_DIR$/harmonyApp" />
             <option value="$PROJECT_DIR$/shared" />

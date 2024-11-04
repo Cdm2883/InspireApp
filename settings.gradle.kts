@@ -32,6 +32,7 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+include(":composeApp:wearOs")
 include(":harmonyApp")
 include(":browserExtension")
 include(":dataSynchronizer")
