@@ -173,7 +173,7 @@ kotlin {
                 implementation(compose.material3)
             }
         }
-        androidMain.get().apply {
+        androidMain {
             dependsOn(materialMain)
             dependencies {
                 implementation(compose.preview)
@@ -184,10 +184,10 @@ kotlin {
         val webMain by creating {
             dependsOn(materialMain)
         }
-        wasmJsMain.get().apply {
+        wasmJsMain {
             dependsOn(webMain)
         }
-        jsMain.get().apply {
+        jsMain {
             dependsOn(webMain)
         }
 
@@ -197,7 +197,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
-        jvmMain.get().apply {
+        jvmMain {
             dependsOn(desktopMain)
             dependsOn(materialMain)
         }
