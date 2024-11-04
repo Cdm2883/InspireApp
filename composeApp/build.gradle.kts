@@ -19,29 +19,6 @@ val appVersion = libs.versions.inspire.app.version.get()
 val appVersionCore = """(\d+)\.(\d+)\.(\d+)""".toRegex().find(appVersion)?.value ?: throw Error()
 val appVersionCode = libs.versions.inspire.app.code.get().toInt()
 
-enum class DesktopPlatforms(val kebabName: String) {
-    MacosArm64("macos-arm64"),
-    MacosX64("macos-x64"),
-    LinuxArm64("linux-arm64"),
-    LinuxX64("linux-x64"),
-    WindowsX64("windows-x64");
-    companion object {
-        val Current by lazy {
-            val hostOs = System.getProperty("os.name")
-            val isArm64 = System.getProperty("os.arch") == "aarch64"
-            val isMingwX64 = hostOs.startsWith("Windows")
-            when {
-                hostOs == "Mac OS X" && isArm64 -> MacosArm64
-                hostOs == "Mac OS X" && !isArm64 -> MacosX64
-                hostOs == "Linux" && isArm64 -> LinuxArm64
-                hostOs == "Linux" && !isArm64 -> LinuxX64
-                isMingwX64 -> WindowsX64
-                else -> throw GradleException("Host OS is not supported in Compose Desktop.")
-            }
-        }
-    }
-}
-
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -49,7 +26,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     jvm {
         compilations {
             val main by getting
@@ -86,7 +63,6 @@ kotlin {
                 }
                 tasks.register<AbstractProguardTask>("packageReleaseFluentDesktopForCurrentOs") {
                     dependsOn(jarTask)
-                    fun buildDirFile(path: String) = layout.buildDirectory.file(path).get().asFile
                     val jar = jarTask.get()
 
                     proguardVersion = libs.versions.proguard.get()
@@ -254,15 +230,16 @@ dependencies {
 
 // Web Resources
 val webResourcesInject = mapOf<_, File.(isWasm: Boolean) -> Unit>(
-    "index.html" to {
-        writeText(readText().replace("{% TARGET_HEAD %}", if (it) "" else """
-            <script src="skiko.js"></script>
-        """.trimIndent()))
-    }
+    "index.html" to { transformText {
+        replace("{% TARGET_HEAD %}",
+            if (it) "" else """
+                <script src="skiko.js"></script>
+            """.trimIndent()
+        )
+    } }
 )
 fun injectWebResources(isWasm: Boolean) = webResourcesInject.forEach { (path, action) ->
-    val processedDir = "${layout.buildDirectory.get()}/processedResources/${if (isWasm) "wasmJs" else "js"}/main"
-    val file = file("$processedDir/$path")
+    val file = buildDirFile("processedResources/${if (isWasm) "wasmJs" else "js"}/main/$path")
     action(file, isWasm)
 }
 tasks.named("wasmJsProcessResources") {
@@ -302,6 +279,35 @@ compose.desktop {
             optimize = true
             joinOutputJars = true
             configurationFiles.from(project.file("compose-desktop.pro"))
+        }
+    }
+}
+
+
+
+fun buildDirFile(path: String) = layout.buildDirectory.file(path).get().asFile
+
+fun File.transformText(transformer: String.() -> String) = writeText(transformer(readText()))
+
+enum class DesktopPlatforms(val kebabName: String) {
+    MacosArm64("macos-arm64"),
+    MacosX64("macos-x64"),
+    LinuxArm64("linux-arm64"),
+    LinuxX64("linux-x64"),
+    WindowsX64("windows-x64");
+    companion object {
+        val Current by lazy {
+            val hostOs = System.getProperty("os.name")
+            val isArm64 = System.getProperty("os.arch") == "aarch64"
+            val isMingwX64 = hostOs.startsWith("Windows")
+            when {
+                hostOs == "Mac OS X" && isArm64 -> MacosArm64
+                hostOs == "Mac OS X" && !isArm64 -> MacosX64
+                hostOs == "Linux" && isArm64 -> LinuxArm64
+                hostOs == "Linux" && !isArm64 -> LinuxX64
+                isMingwX64 -> WindowsX64
+                else -> throw GradleException("Host OS is not supported in Compose Desktop.")
+            }
         }
     }
 }
