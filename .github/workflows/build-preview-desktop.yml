@@ -19,6 +19,7 @@ on:
 
 jobs:
   build:
+    name: Build Preview Desktop
     strategy:
       matrix:
         targets:
