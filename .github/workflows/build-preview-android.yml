@@ -21,7 +21,6 @@ on:
 
 jobs:
   build:
-    name: Build Preview Android
     runs-on: ubuntu-latest
 
     steps:
@@ -59,7 +58,6 @@ jobs:
           path: preview-unsigned.apk
 
   sign:
-    name: Sign Preview Android Bundle
     runs-on: ubuntu-latest
     needs: build
 

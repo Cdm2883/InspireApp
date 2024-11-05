@@ -17,7 +17,6 @@ on:
 
 jobs:
   build:
-    name: Deploy Website
     runs-on: ubuntu-latest
 
     steps:
