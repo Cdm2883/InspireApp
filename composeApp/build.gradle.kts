@@ -141,6 +141,8 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(projects.shared)
             implementation(projects.dataSynchronizer)
+            implementation(libs.jetbrains.androidx.lifecycle.viewmodel.compose)  // do not change, decompose is so huge
+            implementation(libs.jetbrains.androidx.navigation.compose)           // and not fully adapted to official libs.
         }
 
         // Material Design
@@ -172,6 +174,7 @@ kotlin {
             dependsOn(commonMain.get())
             dependencies {
                 implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutines.swing)
             }
         }
         jvmMain {
