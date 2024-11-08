@@ -210,15 +210,31 @@ android {
         }
     }
     buildTypes {
+        val debugResources = listOf(
+            "kotlin/**.kotlin_builtins",  // https://stackoverflow.com/questions/41052868/what-are-kotlin-builtins-files-and-can-i-omit-them-from-my-uberjars
+            "META-INF/**.version",
+            "DebugProbesKt.bin",  // https://github.com/Kotlin/kotlinx.coroutines?tab=readme-ov-file#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
+        )
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-android-rules.pro")
+            packaging  {
+                resources.excludes += debugResources
+                resources.excludes += "kotlin-tooling-metadata.json"  // https://github.com/Kotlin/kotlinx.coroutines/issues/3158#issuecomment-1023151105
+            }
         }
         create("preview") {
             initWith(getByName("release"))
             versionNameSuffix = "-preview"
             applicationIdSuffix = ".preview"
+        }
+        debug {
+            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug"
+            packaging  {
+                resources.excludes -= debugResources
+            }
         }
     }
     compileOptions {
