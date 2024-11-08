@@ -34,11 +34,38 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :composeApp:wasmJsBrowserDistribution
           ./gradlew :composeApp:jsBrowserDistribution
-          mv composeApp/build/dist/js/productionExecutable composeApp/build/dist/wasmJs/productionExecutable/kjs
+
+      - name: Mix web structure
+        run: |
+          generate_redirect_page() {
+            local output_path=$1
+            local redirect_url=$2
+            mkdir -p "$(dirname "$output_path")"
+            cat > "$output_path" <<EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+          <meta http-equiv="refresh" content="0; url=$redirect_url">
+          <script>location.href="$redirect_url"</script>
+          </head>
+          <body>
+          <p>If you are not redirected, <a href="$redirect_url">click here</a>.</p>
+          </body>
+          </html>
+          EOF
+          
+            echo "Redirect page created at $output_path to $redirect_url"
+          }
+          
+          mkdir -p build/website
+          
+          mv composeApp/build/dist/wasmJs/productionExecutable/* build/website
+          mv composeApp/build/dist/js/productionExecutable build/website/compat
+          generate_redirect_page "build/website/_/index.html" "../compat/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./composeApp/build/dist/wasmJs/productionExecutable
+          publish_dir: ./build/website
           cname: inspire.cdms.vip
