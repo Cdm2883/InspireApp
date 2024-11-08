@@ -4,8 +4,7 @@ package vip.cdms.inspire.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 
 @Immutable
@@ -529,6 +528,10 @@ data class ColorFamily(
 //    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 //)
 
+internal val LocalExtendedColorScheme = staticCompositionLocalOf { extendedLight }
+val MaterialTheme.extendedColorScheme
+    @Composable @ReadOnlyComposable get() = LocalExtendedColorScheme.current
+
 enum class Contrast { Normal, Medium, High }
 
 fun getDefaultColorSchemes(darkTheme: Boolean, contrast: Contrast) = when {
@@ -550,12 +553,15 @@ internal fun AppTheme0(
     extendedColorScheme: ExtendedColorScheme,
     content: @Composable () -> Unit
 ) {
-    // TODO: extended color scheme provider
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalExtendedColorScheme provides extendedColorScheme
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content
+        )
+    }
 }
 
 @Composable
