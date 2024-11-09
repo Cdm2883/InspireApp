@@ -8,6 +8,7 @@ android-sdk-min = "24"
 android-sdk-target = "34"
 compose-multiplatform = "1.7.0"
 kotlin = "2.0.21"
+kotlinx-serialization = "1.7.3"
 gradleup-shadow = "8.3.5"
 proguard = "7.5.0"
 
@@ -24,6 +25,7 @@ mayakapps-compose-window-styler = "0.3.3-SNAPSHOT"
 [libraries]
 jetbrains-androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrains-androidx-lifecycle-viewmodel-compose" }
 jetbrains-androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "jetbrains-androidx-navigation-compose" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 
@@ -39,5 +41,7 @@ android-library = { id = "com.android.library", version.ref = "android-gradle-pl
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+sgrishchenko-karakum = { id = "io.github.sgrishchenko.karakum", version.ref = "sgrishchenko-karakum" }
 gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "gradleup-shadow" }
 proguard-gradle = { id = "com.guardsquare:proguard-gradle", version.ref = "proguard" }
