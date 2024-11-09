@@ -36,12 +36,12 @@ konyaco-fluent-icons-extended = { module = "com.konyaco:fluent-icons-extended", 
 mayakapps-compose-window-styler = { module = "com.mayakapps.compose:window-styler", version.ref = "mayakapps-compose-window-styler" }
 
 [plugins]
+inspire-gradle-plugin = { id = "inspire-gradle-plugin" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-sgrishchenko-karakum = { id = "io.github.sgrishchenko.karakum", version.ref = "sgrishchenko-karakum" }
 gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "gradleup-shadow" }
 proguard-gradle = { id = "com.guardsquare:proguard-gradle", version.ref = "proguard" }

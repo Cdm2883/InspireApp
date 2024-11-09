@@ -6,6 +6,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import vip.cdms.inspire.gradle.HostPlatforms
+import vip.cdms.inspire.gradle.buildDirFile
+import vip.cdms.inspire.gradle.defaultCommonInspireAndroidConfig
+import vip.cdms.inspire.gradle.transformText
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -51,12 +55,12 @@ kotlin {
                 }
                 val jarTask = tasks.register<ShadowJar>("packageFluentDesktopForCurrentOs") {
                     group = taskGroup
-                    archiveBaseName = "Inspire-fluent-" + DesktopPlatforms.Current.kebabName
+                    archiveBaseName = "Inspire-fluent-" + HostPlatforms.Current.kebabName
                     archiveVersion = appVersion
                     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                     from(codeSource) {
-                        val skikoExcludes = enumValues<DesktopPlatforms>().associateWith { "**skiko**${it.kebabName}**" }
-                        exclude(skikoExcludes.filter { (key) -> key != DesktopPlatforms.Current }.values)
+                        val skikoExcludes = enumValues<HostPlatforms>().associateWith { "**skiko**${it.kebabName}**" }
+                        exclude(skikoExcludes.filter { (key) -> key != HostPlatforms.Current }.values)
                     }
                     manifest {
                         attributes["Main-Class"] = codeMainClass
@@ -195,12 +199,12 @@ kotlin {
 }
 
 android {
-    namespace = "vip.cdms.inspire"
-    compileSdk = libs.versions.android.sdk.compile.get().toInt()
-
+    defaultCommonInspireAndroidConfig(
+        compileSdk = libs.versions.android.sdk.compile,
+        minSdk = libs.versions.android.sdk.min
+    )
     defaultConfig {
         applicationId = "vip.cdms.inspire"
-        minSdk = libs.versions.android.sdk.min.get().toInt()
         targetSdk = libs.versions.android.sdk.target.get().toInt()
         versionCode = appVersionCode
         versionName = appVersion
@@ -237,10 +241,6 @@ android {
                 resources.excludes -= debugResources
             }
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
@@ -299,35 +299,6 @@ compose.desktop {
             optimize = true
             joinOutputJars = true
             configurationFiles.from(project.file("compose-desktop.pro"))
-        }
-    }
-}
-
-
-
-fun buildDirFile(path: String) = layout.buildDirectory.file(path).get().asFile
-
-fun File.transformText(transformer: String.() -> String) = writeText(transformer(readText()))
-
-enum class DesktopPlatforms(val kebabName: String) {
-    MacosArm64("macos-arm64"),
-    MacosX64("macos-x64"),
-    LinuxArm64("linux-arm64"),
-    LinuxX64("linux-x64"),
-    WindowsX64("windows-x64");
-    companion object {
-        val Current by lazy {
-            val hostOs = System.getProperty("os.name")
-            val isArm64 = System.getProperty("os.arch") == "aarch64"
-            val isMingwX64 = hostOs.startsWith("Windows")
-            when {
-                hostOs == "Mac OS X" && isArm64 -> MacosArm64
-                hostOs == "Mac OS X" && !isArm64 -> MacosX64
-                hostOs == "Linux" && isArm64 -> LinuxArm64
-                hostOs == "Linux" && !isArm64 -> LinuxX64
-                isMingwX64 -> WindowsX64
-                else -> throw GradleException("Host OS is not supported in Compose Desktop.")
-            }
         }
     }
 }

@@ -31,6 +31,7 @@ dependencyResolutionManagement {
     }
 }
 
+includeBuild("gradle/plugin")
 include(":composeApp")
 include(":composeApp:wearOs")
 include(":harmonyApp")

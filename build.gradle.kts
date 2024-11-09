@@ -8,4 +8,9 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
     alias(libs.plugins.gradleup.shadow) apply false
+    alias(libs.plugins.inspire.gradle.plugin)
+}
+
+subprojects {
+    plugins.apply(rootProject.libs.plugins.inspire.gradle.plugin.get().pluginId)
 }

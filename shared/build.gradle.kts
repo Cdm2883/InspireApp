@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import vip.cdms.inspire.gradle.defaultCommonInspireAndroidConfig
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -26,14 +27,8 @@ kotlin {
     }
 }
 
-android {
-    namespace = "vip.cdms.inspire.shared"
-    compileSdk = libs.versions.android.sdk.compile.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.android.sdk.min.get().toInt()
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
+android.defaultCommonInspireAndroidConfig(
+    namespace = "shared",
+    compileSdk = libs.versions.android.sdk.compile,
+    minSdk = libs.versions.android.sdk.min
+)
