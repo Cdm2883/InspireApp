@@ -14,26 +14,30 @@ proguard = "7.5.0"
 
 jetbrains-androidx-lifecycle-viewmodel-compose = "2.8.3"
 jetbrains-androidx-navigation-compose = "2.8.0-alpha10"
-
 androidx-activity-compose = "1.9.3"
-
 kotlinx-coroutines = "1.9.0"
-
 konyaco-fluent = "0.1.0-SNAPSHOT"
 mayakapps-compose-window-styler = "0.3.3-SNAPSHOT"
+kilua = "0.0.16"
 
 [libraries]
+# Common
 jetbrains-androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrains-androidx-lifecycle-viewmodel-compose" }
 jetbrains-androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "jetbrains-androidx-navigation-compose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
+# Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 
+# JVM
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 
 konyaco-fluent = { module = "com.konyaco:fluent", version.ref = "konyaco-fluent" }
 konyaco-fluent-icons-extended = { module = "com.konyaco:fluent-icons-extended", version.ref = "konyaco-fluent" }
 mayakapps-compose-window-styler = { module = "com.mayakapps.compose:window-styler", version.ref = "mayakapps-compose-window-styler" }
+
+# Web
+kilua-dom = { module = "dev.kilua:kilua-dom", version.ref = "kilua" }
 
 [plugins]
 inspire-gradle-plugin = { id = "inspire-gradle-plugin" }

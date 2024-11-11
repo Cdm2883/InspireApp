@@ -167,6 +167,9 @@ kotlin {
 
         val webMain by creating {
             dependsOn(materialMain)
+            dependencies {
+                implementation(libs.kilua.dom)
+            }
         }
         wasmJsMain {
             dependsOn(webMain)

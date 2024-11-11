@@ -3,6 +3,7 @@ package vip.cdms.inspire.ui.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import web.document
 
 @Composable
 actual fun AppTheme(
@@ -21,14 +22,14 @@ actual fun AppTheme(
     )
 }
 
-internal const val MetaThemeColorID = "meta-theme-color"
-expect fun setBrowserThemeColorMeta(color: Color)  // TODO: different target but same codes (kotlinx.browser)
+private const val MetaThemeColorID = "meta-theme-color"
+private fun setBrowserThemeColorMeta(color: Color) =
+    (document.getElementById(MetaThemeColorID) ?: document.createElement("meta").apply {
+        setAttribute("id", MetaThemeColorID)
+        setAttribute("name", "theme-color")
+        document.head?.appendChild(this)
+    }).setAttribute("content", color.toHex())
 
-fun Color.toHex(): String {
-    fun calc(component: Float) = (component * 255).toInt()
-        .toString(16).padStart(2, '0')
-    val red = calc(red)
-    val green = calc(green)
-    val blue = calc(blue)
-    return "#$red$green$blue"
-}
+private fun Color.toHex() = (fun (component: Float) = (component * 255).toInt()
+    .toString(16).padStart(2, '0'))
+    .let { "#${it(red)}${it(green)}${it(blue)}" }
