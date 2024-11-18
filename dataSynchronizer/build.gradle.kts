@@ -40,6 +40,7 @@ kotlin {
             dependsOn(commonMain.get())
             dependencies {
                 implementation(libs.kilua.dom)
+                implementation(npm("webrtc-adapter", "9.0.1"))
             }
         }
         wasmJsMain {
