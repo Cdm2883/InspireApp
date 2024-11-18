@@ -24,20 +24,13 @@ abstract class KVStorage : ElementGetter() {
         // TODO: store
     }
 
+    /** Just the KVStorage itself */
+    @Deprecated("Redundant calls", ReplaceWith("this"))
     @Suppress("LeakingThis")
     override val storage = this
 
     protected abstract fun setValue0(key: String, value: String?)
     protected abstract fun getValue0(key: String): String?
-
-    fun <T : Any> set(clazz: KClass<T>, vararg keys: String, value: T?) {
-        val setting = value?.toString()  // TODO
-        set(keys = keys, value = setting)
-    }
-    fun <T : Any> get(clazz: KClass<T>, vararg keys: String): T? {
-        val value = get(keys = keys)
-        return value as? T?  // TODO
-    }
 
     internal class ChangeObserver {
         private val listeners = mutableMapOf<String, MutableList<() -> Unit>>()
@@ -45,16 +38,30 @@ abstract class KVStorage : ElementGetter() {
         fun on(key: String, callback: () -> Unit) = listeners.getOrPut(key) { mutableListOf() }.add(callback)
     }
     internal val changeObserver = ChangeObserver()
-    operator fun set(vararg keys: String, value: String?) {
+    @Deprecated("Never write the raw content directly unless you know what you're doing!")
+    fun setRaw(vararg keys: String, value: String?) {
         val key = resolve(keys = keys)
         setValue0(key, value)
         changeObserver.notify(key)
     }
-    operator fun get(vararg keys: String) = getValue0(resolve(keys = keys))
+    @Deprecated("Never read the raw content directly unless you know what you're doing!", ReplaceWith("this.get<String>(*keys)"))
+    fun getRaw(vararg keys: String) = getValue0(resolve(keys = keys))
 
-    inline fun <reified T : Any> set(vararg keys: String, value: T?) = set(T::class, keys = keys, value = value)
-    inline fun <reified T : Any> get(vararg keys: String) = get(T::class, keys = keys)
-    @Deprecated("At least pass a 'key' is needed.", ReplaceWith("get(\"\")"), level = DeprecationLevel.ERROR)
+    fun <T : Any> set(clazz: KClass<T>, vararg keys: String, value: T?) {
+        @Suppress("DEPRECATION")
+        if (value == null) setRaw(keys = keys, value = null)
+        @Suppress("DEPRECATION")
+        setRaw(keys = keys, value = StorageSerialization.encode(clazz, value!!))
+    }
+    fun <T : Any> get(clazz: KClass<T>, vararg keys: String): T? {
+        @Suppress("DEPRECATION")
+        val value = getRaw(keys = keys) ?: return null
+        return StorageSerialization.decode(clazz, value)
+    }
+
+    inline operator fun <reified T : Any> set(vararg keys: String, value: T?) = set(T::class, keys = keys, value = value)
+    inline operator fun <reified T : Any> get(vararg keys: String) = get(T::class, keys = keys)
+    @Deprecated("At least pass a 'key' is needed.", ReplaceWith("get(\"\")"), DeprecationLevel.ERROR)
     fun get(): Nothing = throw UnsupportedOperationException()
 
     companion object {
