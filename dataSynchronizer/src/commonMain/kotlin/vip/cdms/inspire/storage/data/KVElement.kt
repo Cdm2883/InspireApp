@@ -15,7 +15,7 @@ sealed class KVElement<T> private constructor(
     protected fun observing() = storage.changeObserver.on(key) { recompose() }
 
     private fun subscribe() { observer.value }
-    private fun recompose() { observer.value = !observer.value }
+    protected fun recompose() { observer.value = !observer.value }
 
     override var value: T
         get() = update().also { subscribe() }
@@ -42,6 +42,7 @@ sealed class KVElement<T> private constructor(
         init { observing() }
         override fun update(value: T?) = storage.set(clazz, key, value = value)
         override fun update() = storage.get(clazz, key) ?: default()
+        fun clear() { update(null); recompose() }
     }
 
 }
