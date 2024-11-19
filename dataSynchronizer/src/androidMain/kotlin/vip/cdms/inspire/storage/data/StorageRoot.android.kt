@@ -7,4 +7,7 @@ actual object StorageRoot : KVStorage() {
     actual override fun getValue0(key: String): String? {
         TODO("Not yet implemented")
     }
+    actual override fun clear() {
+        TODO("Not yet implemented")
+    }
 }

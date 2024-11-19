@@ -31,6 +31,7 @@ abstract class KVStorage : ElementGetter() {
 
     protected abstract fun setValue0(key: String, value: String?)
     protected abstract fun getValue0(key: String): String?
+    protected abstract fun clear()
 
     internal class ChangeObserver {
         private val listeners = mutableMapOf<String, MutableList<() -> Unit>>()
