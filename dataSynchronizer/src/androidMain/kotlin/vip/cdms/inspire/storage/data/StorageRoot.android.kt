@@ -1,12 +1,11 @@
 package vip.cdms.inspire.storage.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.core.content.edit
 import vip.cdms.inspire.utils.GlobalContext
 
 actual object StorageRoot : KVStorage() {
-    private val sharedPreferences: SharedPreferences by lazy {
+    private val sharedPreferences by lazy {
         // PreferenceManager.getDefaultSharedPreferences(GlobalContext!!)
         GlobalContext!!.getSharedPreferences(GlobalContext!!.packageName + "_preferences", Context.MODE_PRIVATE)
     }
