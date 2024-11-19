@@ -36,6 +36,10 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
         }
 
+        androidMain.dependencies {
+            implementation(libs.androidx.appcompat)
+        }
+
         val webMain by creating {
             dependsOn(commonMain.get())
             dependencies {
