@@ -1,13 +1,19 @@
 package vip.cdms.inspire.storage.data
 
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
+import vip.cdms.inspire.utils.GlobalContext
+
 actual object StorageRoot : KVStorage() {
-    actual override fun setValue0(key: String, value: String?) {
-        TODO("Not yet implemented")
+    private val sharedPreferences: SharedPreferences by lazy {
+        // PreferenceManager.getDefaultSharedPreferences(GlobalContext!!)
+        GlobalContext!!.getSharedPreferences(GlobalContext!!.packageName + "_preferences", Context.MODE_PRIVATE)
     }
-    actual override fun getValue0(key: String): String? {
-        TODO("Not yet implemented")
+    actual override fun setValue0(key: String, value: String?) = sharedPreferences.edit {
+        value?.let { putString(key, it) } ?: remove(key)
+        commit()
     }
-    actual override fun clear() {
-        TODO("Not yet implemented")
-    }
+    actual override fun getValue0(key: String) = sharedPreferences.getString(key, null)
+    actual override fun clear() { sharedPreferences.edit().clear().commit() }
 }
