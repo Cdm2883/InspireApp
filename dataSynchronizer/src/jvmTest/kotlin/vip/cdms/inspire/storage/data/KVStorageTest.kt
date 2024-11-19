@@ -21,6 +21,7 @@ class KVStorageTest {
         val map = mutableMapOf<String, String?>()
         override fun setValue0(key: String, value: String?) { map[key] = value }
         override fun getValue0(key: String) = map[key]
+        override fun clear() = map.clear()
     }
     @BeforeTest
     fun clearStorageContent() = TestStorage.map.clear()
