@@ -3,6 +3,9 @@ package vip.cdms.inspire.storage.data
 import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
 
+/**
+ * Developer friendly key-value storage
+ */
 abstract class KVStorage : ElementGetter() {
 
     /**
