@@ -49,10 +49,9 @@ abstract class KVStorage : ElementGetter() {
     fun getRaw(vararg keys: String) = getValue0(resolve(keys = keys))
 
     fun <T : Any> set(clazz: KClass<T>, vararg keys: String, value: T?) {
+        val encoded = if (value == null) null else StorageSerialization.encode(clazz, value)
         @Suppress("DEPRECATION")
-        if (value == null) return setRaw(keys = keys, value = null)
-        @Suppress("DEPRECATION")
-        setRaw(keys = keys, value = StorageSerialization.encode(clazz, value))
+        setRaw(keys = keys, value = encoded)
     }
     fun <T : Any> get(clazz: KClass<T>, vararg keys: String): T? {
         @Suppress("DEPRECATION")
