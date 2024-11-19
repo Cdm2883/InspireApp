@@ -9,19 +9,16 @@ abstract class KVStorage : ElementGetter() {
      * ```kt
      * object UserSettings : KVStorage.KeyOf("Settings", "User"),
      *     StorageProvider by StorageRoot {
-     *     var name by store<String> { "Mike" }
-     *     var age by a<Short>()
-     *     // var age = store<Short>()  // only delegations are allowed
-     *     var habit = keyOf<String>("habit")
-     *     var description by keyOf<String>("description")
+     *     var name = keyOf<String>("nickname") { "Mike" }
+     *     var age by keyOf<Int>("age")
      * }
      * ```
      */
     abstract class KeyOf(vararg val keys: String) : ElementGetter(parents = keys) {
         constructor(parent: KeyOf, vararg keys: String): this(*parent.keys, *keys)
+        abstract inner class Nesting(vararg keys: String) : KeyOf(this, keys = keys), StorageProvider by this
         fun resolve(vararg keys: String) = KVStorage.resolve(*this.keys, *keys)
         val key = resolve()
-        // TODO: store
     }
 
     /** Just the KVStorage itself */
