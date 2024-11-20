@@ -1,0 +1,8 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+module:dataSynchronizer
+vip.cdms.inspire.storage.data
+vip.cdms.inspire.storage.file
+vip.cdms.inspire.sync
+vip.cdms.inspire.utils
