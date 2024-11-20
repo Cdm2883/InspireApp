@@ -34,6 +34,7 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :composeApp:wasmJsBrowserDistribution
           ./gradlew :composeApp:jsBrowserDistribution
+          ./gradlew :generateKDoc
 
       - name: Mix web structure
         run: |
@@ -62,6 +63,8 @@ jobs:
           mv composeApp/build/dist/wasmJs/productionExecutable/* build/website
           mv composeApp/build/dist/js/productionExecutable build/website/compat
           generate_redirect_page "build/website/_/index.html" "../compat/"
+          
+          mv build/dokka/html build/website/modules
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
