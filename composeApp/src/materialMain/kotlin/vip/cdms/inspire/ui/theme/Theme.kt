@@ -6,6 +6,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import vip.cdms.inspire.storage.data.KVStorage
+import vip.cdms.inspire.storage.data.StorageProvider
+import vip.cdms.inspire.storage.data.StorageRoot
 
 @Immutable
 data class ExtendedColorScheme(
@@ -564,10 +567,17 @@ internal fun AppTheme0(
     }
 }
 
+object AppTheme : KVStorage.KeyOf("theme"), StorageProvider by StorageRoot {
+    var darkTheme by keyOf<Boolean>("dark")
+    val darkThemeOrSystem
+        @Composable
+        get() = darkTheme ?: isSystemInDarkTheme()
+    var contrast by keyOf("contrast") { Contrast.Normal }
+}
+
 @Composable
 expect fun AppTheme(
-    // TODO: get values from settings
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    contrast: Contrast = Contrast.Normal,
+    darkTheme: Boolean = AppTheme.darkThemeOrSystem,
+    contrast: Contrast = AppTheme.contrast,
     content: @Composable () -> Unit
 )
