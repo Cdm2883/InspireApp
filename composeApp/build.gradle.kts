@@ -10,6 +10,8 @@ import vip.cdms.inspire.gradle.HostPlatforms
 import vip.cdms.inspire.gradle.buildDirFile
 import vip.cdms.inspire.gradle.defaultCommonInspireAndroidConfig
 import vip.cdms.inspire.gradle.transformText
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -20,7 +22,7 @@ plugins {
     alias(libs.plugins.gradleup.shadow)
 }
 
-val appVersion = libs.versions.inspire.app.version.get()
+val appVersion: String = libs.versions.inspire.app.version.get()
 val appVersionCore = """(\d+)\.(\d+)\.(\d+)""".toRegex().find(appVersion)?.value ?: throw Error()
 val appVersionCode = libs.versions.inspire.app.code.get().toInt()
 
@@ -32,9 +34,40 @@ kotlin {
         }
     }
 
+    val jPen = object {
+        private val libs = "src/jvmMain/libs/jpen"
+        val jar = "$libs/jpen-2.jar"
+        val jni = object {
+//            val linux = "$libs/libjpen-2-4.so"
+            val linux_64 = "$libs/libjpen-2-4-x86_64.so"
+//            val win = "$libs/jpen-2-3.dll"
+            val win_64 = "$libs/jpen-2-3-64.dll"
+            val osx = "$libs/libjpen-2-3.jnilib"
+//            val all = arrayOf(linux, linux_64, win, win_64, osx)
+        }
+    }
     jvm {
+//        withJava()  // KT-30878
         compilations {
-            val main by getting
+            val main by getting {
+                tasks.named("jvmProcessResources") {
+                    doLast {
+                        val jPenRes = buildDirFile("processedResources/jvm/main/jpen")
+                        val jPenJni = when (HostPlatforms.Current) {
+                            HostPlatforms.MacosArm64 -> jPen.jni.osx
+                            HostPlatforms.MacosX64 -> null
+                            HostPlatforms.LinuxArm64 -> null
+                            HostPlatforms.LinuxX64 -> jPen.jni.linux_64
+                            HostPlatforms.WindowsX64 -> jPen.jni.win_64
+                        }
+                        if (jPenJni == null) return@doLast
+                        val jPenJniFile = file(jPenJni)
+                        Files.deleteIfExists(jPenRes.toPath())
+                        jPenRes.mkdirs()
+                        Files.copy(jPenJniFile.toPath(), File(jPenRes, jPenJniFile.name).toPath(), StandardCopyOption.REPLACE_EXISTING)
+                    }
+                }
+            }
             val fluent by compilations.creating {
                 defaultSourceSet {
                     dependencies {
@@ -67,6 +100,7 @@ kotlin {
                     }
                 }
                 tasks.register<AbstractProguardTask>("packageReleaseFluentDesktopForCurrentOs") {
+                    group = taskGroup
                     dependsOn(jarTask)
                     val jar = jarTask.get()
 
@@ -178,16 +212,22 @@ kotlin {
             dependsOn(webMain)
         }
 
+        // Now is for JVM only, but will be extended
+        // after Compose Desktop for macOS & Windows **native** compilation.
+        // So put JVM only dependencies here is **NOT** allowed.
         val desktopMain by creating {
             dependsOn(commonMain.get())
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(libs.kotlinx.coroutines.swing)
             }
         }
         jvmMain {
             dependsOn(desktopMain)
             dependsOn(materialMain)
+            dependencies {
+                implementation(libs.kotlinx.coroutines.swing)
+                implementation(files(jPen.jar))
+            }
         }
         // Fluent Design
         val jvmFluent by getting {
