@@ -15,18 +15,11 @@ fun JvmUtils.copyToJavaLibraryPath(libraryFile: File) = System.getProperty("java
 
 fun JvmUtils.tempDir(prefix: String): File = Files.createTempDirectory(prefix).toFile().apply { deleteOnExit() }
 
-fun JvmUtils.tempExtractInsideJar(
-    fileName: String,
-    tempDir: File = tempDir("inside_jar")
-): File {
-    val filePath = "/$fileName"
-
-    val inputStream = object {}.javaClass.getResourceAsStream(filePath)
-        ?: throw IllegalArgumentException("File not found in JAR: $filePath")
-
-    val tempFile = File(tempDir, filePath)
-    Files.copy(inputStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-    tempFile.deleteOnExit()
-
-    return tempFile
+fun JvmUtils.tempExtractInsideJar(fileName: String, tempDir: File = tempDir("inside_jar")): File {
+    val inputStream = object {}.javaClass.getResourceAsStream("/$fileName")
+        ?: throw IllegalArgumentException("File not found in JAR: $fileName")
+    return File(tempDir, fileName).apply {
+        deleteOnExit()
+        Files.copy(inputStream, toPath(), StandardCopyOption.REPLACE_EXISTING)
+    }
 }

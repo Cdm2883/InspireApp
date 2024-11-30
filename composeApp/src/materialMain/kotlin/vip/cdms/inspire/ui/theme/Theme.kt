@@ -532,6 +532,7 @@ data class ColorFamily(
 //)
 
 internal val LocalExtendedColorScheme = staticCompositionLocalOf { extendedLight }
+@Suppress("UnusedReceiverParameter")
 val MaterialTheme.extendedColorScheme
     @Composable @ReadOnlyComposable get() = LocalExtendedColorScheme.current
 

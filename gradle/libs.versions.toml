@@ -20,6 +20,7 @@ androidx-activity-compose = "1.9.3"
 kotlinx-coroutines = "1.9.0"
 konyaco-fluent = "0.1.0-SNAPSHOT"
 mayakapps-compose-window-styler = "0.3.3-SNAPSHOT"
+#noinspection GradleDependency
 kilua = "0.0.16"
 
 [libraries]

@@ -1,7 +1,6 @@
 package vip.cdms.inspire
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.CanvasBasedWindow
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import org.jetbrains.skiko.wasm.onWasmReady
