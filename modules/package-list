@@ -1,6 +1,9 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
 
+module:whiteboard
+vip.cdms.inspire.whiteboard
+vip.cdms.inspire.whiteboard.utils
 module:dataSynchronizer
 vip.cdms.inspire.storage.data
 vip.cdms.inspire.storage.file
