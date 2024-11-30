@@ -9,10 +9,8 @@ import java.nio.file.StandardCopyOption
 
 fun JvmUtils.copyToJavaLibraryPath(libraryFile: File) = System.getProperty("java.library.path").split(File.pathSeparator).any { libraryPath ->
     val targetDir = File(libraryPath).takeIf { it.exists() && it.isDirectory } ?: return@any false
-    val targetFile = File(targetDir, libraryFile.name)
-    Files.copy(libraryFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-    targetFile.deleteOnExit()
-    false
+    val targetFile = File(targetDir, libraryFile.name).apply { deleteOnExit() }
+    runCatching { Files.copy(libraryFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING) }.isSuccess
 }
 
 fun JvmUtils.tempDir(prefix: String): File = Files.createTempDirectory(prefix).toFile().apply { deleteOnExit() }
