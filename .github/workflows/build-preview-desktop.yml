@@ -11,6 +11,7 @@ on:
       - 'composeApp/src/wasmJsMain/**'
       - 'composeApp/src/jsMain/**'
       - 'composeApp/proguard-android-rules.pro'
+      - 'composeApp/wearOs'
       - '.gitignore'
       - 'README.md'
   pull_request:

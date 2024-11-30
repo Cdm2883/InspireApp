@@ -1,10 +1,10 @@
 package vip.cdms.inspire.storage.data
 
-import vip.cdms.inspire.utils.SelfJar
+import vip.cdms.inspire.utils.JvmUtils
 import java.util.*
 
 actual object StorageRoot : KVStorage() {
-    private val file by lazy { SelfJar.Location.resolve("preferences.properties") }
+    private val file by lazy { JvmUtils.CodeLocation.resolve("preferences.properties") }
     private val properties by lazy { Properties().apply { loadFromFile() } }
 
     private fun Properties.loadFromFile() {

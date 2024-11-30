@@ -12,6 +12,8 @@ on:
       - 'composeApp/src/jvmFluent/**'
       - 'composeApp/compose-desktop.pro'
       - 'composeApp/proguard-android-rules.pro'
+      - 'composeApp/wearOs'
+      - 'composeApp/whiteboard/src/jvmMain'
       - '.gitignore'
       - 'README.md'
 

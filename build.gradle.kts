@@ -18,6 +18,7 @@ subprojects {
 
 dependencies {
     dokkatoo(projects.dataSynchronizer)
+    dokkatoo(projects.composeApp.whiteboard)
 }
 
 val dokkaInjectJs = """

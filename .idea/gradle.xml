@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/browserExtension" />
             <option value="$PROJECT_DIR$/composeApp" />
             <option value="$PROJECT_DIR$/composeApp/wearOs" />
+            <option value="$PROJECT_DIR$/composeApp/whiteboard" />
             <option value="$PROJECT_DIR$/dataSynchronizer" />
             <option value="$PROJECT_DIR$/gradle/plugin" />
             <option value="$PROJECT_DIR$/harmonyApp" />

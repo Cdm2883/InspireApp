@@ -34,6 +34,7 @@ dependencyResolutionManagement {
 includeBuild("gradle/plugin")
 include(":composeApp")
 include(":composeApp:wearOs")
+include(":composeApp:whiteboard")
 include(":harmonyApp")
 include(":browserExtension")
 include(":dataSynchronizer")
