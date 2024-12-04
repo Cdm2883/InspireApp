@@ -12,14 +12,17 @@ import jpen.PLevel
 import jpen.PLevelEvent
 import jpen.Pen
 import jpen.event.PenAdapter
-import vip.cdms.inspire.whiteboard.utils.RegularJPen
 import vip.cdms.inspire.whiteboard.utils.jpen.RegularJPen
+import vip.cdms.inspire.whiteboard.utils.rememberWhiteboardState
 
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Inspire Whiteboard",
     ) {
+        val state = rememberWhiteboardState()
+        InspireWhiteboard(state)
+
         val messages = remember { mutableStateListOf<String>() }
 
         SideEffect {
@@ -57,6 +60,7 @@ fun main() = application {
                 }
             }
             RegularJPen.addListener(listener)
+//            PenManager(AwtJPen.Owner(window)).pen.addListener(listener)
         }
     }
 }
