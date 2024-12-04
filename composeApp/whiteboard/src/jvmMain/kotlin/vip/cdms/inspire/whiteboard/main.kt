@@ -13,6 +13,7 @@ import jpen.PLevelEvent
 import jpen.Pen
 import jpen.event.PenAdapter
 import vip.cdms.inspire.whiteboard.utils.RegularJPen
+import vip.cdms.inspire.whiteboard.utils.jpen.RegularJPen
 
 fun main() = application {
     Window(
