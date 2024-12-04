@@ -3,7 +3,9 @@ $dokka.linkExtension:html
 
 module:whiteboard
 vip.cdms.inspire.whiteboard
+vip.cdms.inspire.whiteboard.graphics
 vip.cdms.inspire.whiteboard.utils
+vip.cdms.inspire.whiteboard.utils.jpen
 module:dataSynchronizer
 vip.cdms.inspire.storage.data
 vip.cdms.inspire.storage.file
