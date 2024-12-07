@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation(gradleApi())
     implementation("com.android.tools.build:gradle:${libs.versions.android.gradle.plugin.get()}")
+    compileOnly(libs.plugins.adamko.dokkatoo.html.get().run { "$pluginId:$pluginId.gradle.plugin:$version" })
 }
 
 gradlePlugin {

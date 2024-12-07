@@ -1,3 +1,6 @@
+import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
+import vip.cdms.inspire.gradle.footerCopyright
+
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
@@ -11,6 +14,8 @@ plugins {
     alias(libs.plugins.gradleup.shadow) apply false
     alias(libs.plugins.adamko.dokkatoo.html)
 }
+
+version = libs.versions.inspire.app.version.get()
 
 subprojects {
     plugins.apply(rootProject.libs.plugins.inspire.gradle.plugin.get().pluginId)
@@ -33,4 +38,10 @@ tasks.register("generateKDoc") {
     doLast { layout.buildDirectory
         .file("dokka/html/scripts/navigation-loader.js")
         .get().asFile.appendText(dokkaInjectJs) }
+}
+dokkatoo {
+    footerCopyright()
+}
+tasks.withType<DokkatooGenerateTask> {
+    generator.includes.from("dokka-homepage.md")
 }

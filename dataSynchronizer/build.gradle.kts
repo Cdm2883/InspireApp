@@ -2,6 +2,8 @@ import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import vip.cdms.inspire.gradle.defaultCommonInspireAndroidConfig
+import vip.cdms.inspire.gradle.footerCopyright
+import vip.cdms.inspire.gradle.sourceLinkToGithub
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -84,3 +86,12 @@ android.defaultCommonInspireAndroidConfig(
     compileSdk = libs.versions.android.sdk.compile,
     minSdk = libs.versions.android.sdk.min
 )
+
+dokkatoo {
+    moduleName.set("Data Synchronizer")
+    dokkatooSourceSets.configureEach {
+        includes.from("dokka-module.md")
+        sourceLinkToGithub(project)
+    }
+    footerCopyright()
+}

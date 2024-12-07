@@ -104,3 +104,12 @@ compose.desktop {
         }
     }
 }
+
+dokkatoo {
+    moduleName.set("Inspire Whiteboard")
+    dokkatooSourceSets.configureEach {
+        includes.from("dokka-module.md")
+        sourceLinkToGithub(project)
+    }
+    footerCopyright()
+}

@@ -15,6 +15,7 @@ import jpen.event.PenAdapter
 import vip.cdms.inspire.whiteboard.utils.jpen.RegularJPen
 import vip.cdms.inspire.whiteboard.utils.rememberWhiteboardState
 
+/** `Compose Desktop` Entry Point */
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
