@@ -5,10 +5,7 @@ import org.jetbrains.compose.desktop.application.tasks.AbstractProguardTask
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import vip.cdms.inspire.gradle.HostPlatforms
-import vip.cdms.inspire.gradle.buildDirFile
-import vip.cdms.inspire.gradle.defaultCommonInspireAndroidConfig
-import vip.cdms.inspire.gradle.transformText
+import vip.cdms.inspire.gradle.*
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -263,29 +260,18 @@ val webResourcesInject = mapOf<_, File.(isWasm: Boolean) -> Unit>(
         replace("{% TARGET_HEAD %}",
             if (it) "" else """
                 <script src="skiko.js"></script>
-            """.trimIndent()
-        )
-    } }
+            """.trimIndent())
+    } },
 )
-fun injectWebResources(isWasm: Boolean) = webResourcesInject.forEach { (path, action) ->
-    val file = buildDirFile("processedResources/${if (isWasm) "wasmJs" else "js"}/main/$path")
-    action(file, isWasm)
-}
-tasks.named("wasmJsProcessResources") {
-    doLast { injectWebResources(true) }
-}
-tasks.named("jsProcessResources") {
-    doLast { injectWebResources(false) }
-}
+fun injectWebResources(module: String) = webResourcesInject.forEach { (path, action) ->
+    action(buildDirFile("processedResources/$module/main/$path"), module == "wasmJS") }
+tasks.named("wasmJsProcessResources", doLast { injectWebResources("wasmJs") })
+tasks.named("jsProcessResources", doLast { injectWebResources("js") })
 
 // DO NOT DELETE or FIX IT: build
 tasks {
-    named("jsBrowserProductionWebpack") {
-        dependsOn("wasmJsProductionExecutableCompileSync")
-    }
-    named("wasmJsBrowserProductionWebpack") {
-        dependsOn("jsProductionExecutableCompileSync")
-    }
+    named("jsBrowserProductionWebpack") { dependsOn("wasmJsProductionExecutableCompileSync") }
+    named("wasmJsBrowserProductionWebpack") { dependsOn("jsProductionExecutableCompileSync") }
 }
 
 compose.resources {

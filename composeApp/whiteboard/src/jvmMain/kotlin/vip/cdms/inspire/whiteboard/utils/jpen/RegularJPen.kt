@@ -12,7 +12,6 @@ import java.awt.geom.Point2D
  *
  * See [JPen #10 - provide simple non-AWT example](https://github.com/nicarran/jpen/issues/10).
  */
-@Suppress("MemberVisibilityCanBePrivate")
 object RegularJPen {
     init {
         JPenUtils.loadNativeLibrary()

@@ -15,10 +15,8 @@ dependencies {
 }
 
 gradlePlugin {
-    plugins {
-        create("inspireGradlePlugin") {
-            id = "inspire-gradle-plugin"
-            implementationClass = "vip.cdms.inspire.gradle.InspireGradle"
-        }
+    plugins.create("inspireGradlePlugin") {
+        id = "inspire-gradle-plugin"
+        implementationClass = "vip.cdms.inspire.gradle.InspireGradle"
     }
 }

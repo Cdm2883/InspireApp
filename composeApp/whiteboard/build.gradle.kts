@@ -1,11 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import vip.cdms.inspire.gradle.HostPlatforms
-import vip.cdms.inspire.gradle.buildDirFile
-import vip.cdms.inspire.gradle.defaultCommonInspireAndroidConfig
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
+import vip.cdms.inspire.gradle.*
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -37,26 +33,17 @@ kotlin {
     jvm {
         compilations {
             val main by getting {
-                tasks.named("jvmProcessResources") {
-                    doLast {
-                        val jPenRes = buildDirFile("processedResources/jvm/main/jpen").apply {
-                            Files.deleteIfExists(toPath())
-                        }
-                        val jPenJni = file(when (HostPlatforms.Current) {
-                            HostPlatforms.MacosArm64 -> jPen.jni.osx
-                            HostPlatforms.MacosX64 -> null
-                            HostPlatforms.LinuxArm64 -> null
-                            HostPlatforms.LinuxX64 -> jPen.jni.linux_64
-                            HostPlatforms.WindowsX64 -> jPen.jni.win_64
-                        } ?: return@doLast)
-                        jPenRes.mkdirs()
-                        Files.copy(
-                            jPenJni.toPath(),
-                            File(jPenRes, jPenJni.name).toPath(),
-                            StandardCopyOption.REPLACE_EXISTING
-                        )
-                    }
-                }
+                tasks.named("jvmProcessResources", doLast {
+                    val jPenRes = buildDirFile("processedResources/jvm/main/jpen").apply { deleteRecursively() }
+                    val jPenJni = when (HostPlatforms.Current) {
+                        HostPlatforms.MacosArm64 -> jPen.jni.osx
+                        HostPlatforms.LinuxX64 -> jPen.jni.linux_64
+                        HostPlatforms.WindowsX64 -> jPen.jni.win_64
+                        else -> null
+                    }?.let(::file) ?: return@doLast
+                    jPenRes.mkdirs()
+                    jPenJni.copyTo(File(jPenRes, jPenJni.name), overwrite = true)
+                })
             }
         }
         compilerOptions {

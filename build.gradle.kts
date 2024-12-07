@@ -24,18 +24,13 @@ dependencies {
 val dokkaInjectJs = """
     document.querySelectorAll(".platform-tag.common-like").forEach(tag => {
         const platform = tag.innerText.toLowerCase()
-        if (platform.includes("web")) {
-            tag.classList.remove("common-like")
-            tag.classList.add("wasm-like")
-        }
+        if (platform.includes("web")) tag.classList.replace("common-like", "wasm-like")
     })
 """.trimIndent()
 tasks.register("generateKDoc") {
     group = "dokkatoo"
     dependsOn(tasks.dokkatooGenerate)
-    doLast {
-        layout.buildDirectory
-            .file("dokka/html/scripts/navigation-loader.js")
-            .get().asFile.appendText(dokkaInjectJs)
-    }
+    doLast { layout.buildDirectory
+        .file("dokka/html/scripts/navigation-loader.js")
+        .get().asFile.appendText(dokkaInjectJs) }
 }
