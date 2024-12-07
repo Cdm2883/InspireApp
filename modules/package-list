@@ -1,12 +1,12 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
 
-module:whiteboard
+module:Inspire Whiteboard
 vip.cdms.inspire.whiteboard
 vip.cdms.inspire.whiteboard.graphics
 vip.cdms.inspire.whiteboard.utils
 vip.cdms.inspire.whiteboard.utils.jpen
-module:dataSynchronizer
+module:Data Synchronizer
 vip.cdms.inspire.storage.data
 vip.cdms.inspire.storage.file
 vip.cdms.inspire.sync
