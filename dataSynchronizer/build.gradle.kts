@@ -1,5 +1,4 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import vip.cdms.inspire.gradle.defaultCommonInspireAndroidConfig
@@ -15,14 +14,12 @@ plugins {
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
     jvm {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -72,7 +69,6 @@ kotlin {
         }
     }
 
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         optIn.addAll(
             "androidx.compose.ui.test.ExperimentalTestApi",
