@@ -9,7 +9,7 @@ android-sdk-target = "34"
 compose-multiplatform = "1.7.3"
 kotlin = "2.1.0"
 kotlinx-serialization = "1.8.0"
-gradleup-shadow = "8.3.5"
+gradleup-shadow = "8.3.6"
 proguard = "7.5.0"
 adamko-dokkatoo = "2.4.0"
 
