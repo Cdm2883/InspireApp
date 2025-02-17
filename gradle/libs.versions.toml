@@ -14,7 +14,7 @@ proguard = "7.5.0"
 adamko-dokkatoo = "2.4.0"
 
 jetbrains-androidx-lifecycle-viewmodel-compose = "2.8.4"
-jetbrains-androidx-navigation-compose = "2.8.0-alpha12"
+jetbrains-androidx-navigation-compose = "2.8.0-alpha13"
 androidx-appcompat = "1.7.0"
 androidx-activity-compose = "1.9.3"
 kotlinx-coroutines = "1.10.1"
