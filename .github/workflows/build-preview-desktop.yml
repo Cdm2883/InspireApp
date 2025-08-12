@@ -36,7 +36,7 @@ jobs:
     steps:
 
       - name: Checkout master
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Post summary
         if: matrix.targets.name == 'linux-x64'  # post at only once
