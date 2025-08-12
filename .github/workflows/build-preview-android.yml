@@ -64,7 +64,7 @@ jobs:
 
     steps:
       - name: Download unsigned apk
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: inspire-preview-${{ github.sha }}
           path: unsigned-artifact
